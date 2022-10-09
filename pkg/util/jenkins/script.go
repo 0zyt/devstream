@@ -22,6 +22,12 @@ var cascGroovyScript string
 //go:embed tpl/repo-casc.tpl.yaml
 var repoCascScript string
 
+type BasicAuth struct {
+	Username string
+	Password string
+	Token    string
+}
+
 type scriptError struct {
 	output   string
 	errorMsg string
@@ -37,6 +43,10 @@ type RepoCascConfig struct {
 	// github variables
 	JenkinsURL  string
 	SecretToken string
+	// sonarqube variables
+	SonarqubeURL           string
+	SonarqubeName          string
+	SonarTokenCredentialID string
 }
 
 // all jenkins client return error format is host: error detail
