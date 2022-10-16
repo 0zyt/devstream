@@ -28,9 +28,9 @@ func NewClient(repoInfo *git.RepoInfo) (ClientOperation, error) {
 type ClientOperation interface {
 	InitRepo() error
 	DeleteRepo() error
-	PushLocalFileToRepo(commitInfo *git.CommitInfo, checkUpdate bool) (bool, error)
-	GetLocationInfo(path string) ([]*git.RepoFileStatus, error)
+	PushFiles(commitInfo *git.CommitInfo, checkUpdate bool) (bool, error)
 	DeleteFiles(commitInfo *git.CommitInfo) error
+	GetPathInfo(path string) ([]*git.RepoFileStatus, error)
 	AddWebhook(webhookConfig *git.WebhookConfig) error
 	DeleteWebhook(webhookConfig *git.WebhookConfig) error
 }
@@ -41,8 +41,11 @@ func PushInitRepo(client ClientOperation, commitInfo *git.CommitInfo) error {
 		return err
 	}
 
-	// if encounter rollout error, delete repo
-	var needRollBack bool
+	var (
+		// if encounter rollout error, delete repo
+		needRollBack bool
+		err          error
+	)
 	defer func() {
 		if !needRollBack {
 			return
@@ -54,7 +57,7 @@ func PushInitRepo(client ClientOperation, commitInfo *git.CommitInfo) error {
 	}()
 
 	// 2. push local path to repo
-	needRollBack, err := client.PushLocalFileToRepo(commitInfo, false)
+	needRollBack, err = client.PushFiles(commitInfo, false)
 	return err
 }
 

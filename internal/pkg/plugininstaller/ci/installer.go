@@ -9,6 +9,13 @@ import (
 	"github.com/devstream-io/devstream/internal/pkg/plugininstaller"
 )
 
+const (
+	createCommitMsg = "update ci config"
+	deleteCommitMsg = "delete ci files"
+	// this variable is only used for github to fork a branch and create pr
+	defaultBranch = "feat-repo-ci-update"
+)
+
 func PushCIFiles(options plugininstaller.RawOptions) error {
 	opts, err := NewOptions(options)
 	if err != nil {
@@ -25,10 +32,10 @@ func PushCIFiles(options plugininstaller.RawOptions) error {
 		return err
 	}
 	//4. push ci files to git repo
-	_, err = gitClient.PushLocalFileToRepo(&git.CommitInfo{
-		CommitMsg:    defaultCommitMsg,
-		CommitBranch: defaultBranch,
+	_, err = gitClient.PushFiles(&git.CommitInfo{
+		CommitMsg:    createCommitMsg,
 		GitFileMap:   gitMap,
+		CommitBranch: defaultBranch,
 	}, true)
 	return err
 }
@@ -53,8 +60,9 @@ func DeleteCIFiles(options plugininstaller.RawOptions) error {
 	}
 	//3. delete ci files from git repo
 	commitInfo := &git.CommitInfo{
-		GitFileMap: gitMap,
-		CommitMsg:  deleteCommitMsg,
+		CommitMsg:    deleteCommitMsg,
+		GitFileMap:   gitMap,
+		CommitBranch: opts.ProjectRepo.Branch,
 	}
 	return gitClient.DeleteFiles(commitInfo)
 }
