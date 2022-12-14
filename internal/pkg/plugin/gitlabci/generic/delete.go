@@ -1,24 +1,25 @@
 package generic
 
 import (
-	"github.com/devstream-io/devstream/internal/pkg/plugin/gitlabci"
-	"github.com/devstream-io/devstream/internal/pkg/plugininstaller"
-	"github.com/devstream-io/devstream/internal/pkg/plugininstaller/ci"
+	"github.com/devstream-io/devstream/internal/pkg/configmanager"
+	"github.com/devstream-io/devstream/internal/pkg/plugin/installer"
+	"github.com/devstream-io/devstream/internal/pkg/plugin/installer/ci"
+	"github.com/devstream-io/devstream/internal/pkg/plugin/installer/ci/cifile"
 )
 
-func Delete(options map[string]interface{}) (bool, error) {
-	operator := &plugininstaller.Operator{
-		PreExecuteOperations: plugininstaller.PreExecuteOperations{
-			ci.SetDefaultConfig(gitlabci.DefaultCIOptions),
-			ci.Validate,
+func Delete(options configmanager.RawOptions) (bool, error) {
+	operator := &installer.Operator{
+		PreExecuteOperations: installer.PreExecuteOperations{
+			ci.SetDefault(ciType),
+			validate,
 		},
-		ExecuteOperations: plugininstaller.ExecuteOperations{
-			ci.DeleteCIFiles,
+		ExecuteOperations: installer.ExecuteOperations{
+			cifile.DeleteCIFiles,
 		},
 	}
 
 	// Execute all Operations in Operator
-	_, err := operator.Execute(plugininstaller.RawOptions(options))
+	_, err := operator.Execute(options)
 	if err != nil {
 		return false, err
 	}

@@ -9,7 +9,7 @@ For example, if _Tool_ A has an output, we can use its value as _Tool_ B's optio
 Notes:
 
 - At the moment, B using A's output doesn't mean B "depends on" A.
-- If B really needs to "depend on" A, i.e., we want to make sure A runs first before B runs, we still need to use the `dependsOn` keyword (see the previous section "[Core Concepts](core-concepts.md)" for more details.)
+- If B needs to "depend on" A, i.e., we want to make sure A runs first before B runs, we still need to use the `dependsOn` keyword (see the previous section "[Core Concepts](overview.md)" for more details.)
 
 ## Syntax
 
@@ -52,33 +52,20 @@ tools:
   options:
     destinationRepo:
       owner: IronCore864
-      org: ""
-      repo: golang-demo
+      name: golang-demo
       branch: main
-      repoType: github
+      scmType: github
     vars:
-      ImageRepo: "ironcore864/golang-demo"
+      imageRepo: "ironcore864/golang-demo"
     sourceRepo:
       org: devstream-io
-      repo: dtm-scaffolding-golang
-      repoType: github
-- name: argocd
-  instanceID: default
-  options:
-    repo:
-      name: argo
-      url: https://argoproj.github.io/argo-helm
-    chart:
-      chartPath: ""
-      chartName: argo/argo-cd
-      releaseName: argocd
-      namespace: argocd
-      wait: true
-      timeout: 10m
-      upgradeCRDs: true
+      name: dtm-scaffolding-golang
+      scmType: github
+- name: helm-installer
+  instanceID: argocd
 - name: argocdapp
   instanceID: default
-  dependsOn: [ "argocd.default", "repo-scaffolding.golang-github" ]
+  dependsOn: [ "helm-installer.argocd", "repo-scaffolding.golang-github" ]
   options:
     app:
       name: golang-demo

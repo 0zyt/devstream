@@ -5,19 +5,23 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/Masterminds/sprig/v3"
+
 	"github.com/devstream-io/devstream/pkg/util/log"
 )
 
 func Render(name, templateStr string, variable any, funcMaps ...template.FuncMap) (string, error) {
 	t := template.New(name).Option("missingkey=error").Delims("[[", "]]")
 
+	// use sprig functions such as "env"
+	t.Funcs(sprig.TxtFuncMap())
 	for _, funcMap := range funcMaps {
 		t.Funcs(funcMap)
 	}
 
 	t, err := t.Parse(templateStr)
 	if err != nil {
-		log.Debugf("Template parse file failed: %s.", err)
+		log.Warnf("Template parse file failed, template: %s, err: %s.", templateStr, err)
 		return "", err
 	}
 
@@ -52,8 +56,6 @@ func DefaultRender(templateName string, vars any, funcMaps ...template.FuncMap) 
 		return Render(templateName, string(src), vars, funcMaps...)
 	}
 }
-
-// Quick Calls
 
 func (r *rendererWithGetter) SetDefaultRender(templateName string, vars any, funcMaps ...template.FuncMap) *rendererWithRender {
 	return r.SetRender(DefaultRender(templateName, vars, funcMaps...))

@@ -1,5 +1,7 @@
 # DevStream配置
 
+TODO: 需要跟英文文档同步。请暂且阅读英文文档。
+
 DevStream使用YAML文件来描述你的DevOps工具链配置。
 
 ## 主配置文件
@@ -8,9 +10,6 @@ DevStream使用YAML文件来描述你的DevOps工具链配置。
 
 主配置包含三个部分：
 
-- `varFile`: 指向定义变量的文件路径
-- `toolFile`: 指向定义插件的文件路径
-- `pluginDir`: 指向插件目录的路径，默认为 `~/.devstream/plugins`, 或使用 `-d` 参数指定一个目录
 - `state`: 指定DevStream状态存储位置
 
 ### 主配置文件示例
@@ -19,11 +18,7 @@ DevStream使用YAML文件来描述你的DevOps工具链配置。
 
 ```yaml
 varFile: variables.yaml
-
 toolFile: tools.yaml
-
-pluginDir: /usr/local/devstream/plugins # 可选
-
 state:
   backend: local
   options:
@@ -67,16 +62,15 @@ tools:
   options:
     destinationRepo:
       owner: [[ githubUsername ]]
-      org: ""
-      repo: [[ repoName ]]
+      name: [[ repoName ]]
       branch: [[ defaultBranch ]]
-      repoType: github
+      scmType: github
     vars:
       ImageRepo: "[[ dockerhubUsername ]]/[[ repoName ]]"
     sourceRepo:
       org: devstream-io
-      repo: dtm-scaffolding-golang
-      repoType: github
+      name: dtm-scaffolding-golang
+      scmType: github
 - name: jira-github-integ
   instanceID: default
   dependsOn: [ "repo-scaffolding.golang-github" ]
@@ -95,7 +89,7 @@ tools:
 
 从v0.6.0开始，我们将支持`local`和`s3`两种存储。
 
-更多状态存储细节请参见[DevStream状态存储](./stateconfig.md)
+更多状态存储细节请参见[DevStream状态存储](./state.zh.md)
 
 ## 默认值
 

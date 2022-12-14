@@ -30,7 +30,7 @@ This plugin need fllowing config base on your repo type:
 
 The following content is an example of the "tool file".
 
-For more information on the main config, the tool file and the var file of DevStream, see [Core Concepts Overview](../core-concepts/core-concepts.md#1-config) and [DevStream Configuration](../core-concepts/config.md).
+For more information on the main config, the tool file and the var file of DevStream, see [Core Concepts Overview](../core-concepts/overview.md) and [DevStream Configuration](../core-concepts/config.md).
 
 ```yaml
 --8<-- "repo-scaffolding.yaml"
@@ -50,7 +50,7 @@ This configuration is used for the target repo, it includes the following config
 
 **Please note that all parameter is case-sensitive.**
 
-Currently, `owner`, `org`, and `repo` are mandatory, `branch` has the default value "main", `repoType` support  `gitlab` and `github` for now. 
+Currently, `owner`, `org`, and `repo` are mandatory, `branch` has the default value "main", `scmType` support  `gitlab` and `github` for now. 
 
 ### sourceRepo
 
@@ -60,7 +60,7 @@ This configuration is used for the source scaffolding repoI(only supports GitHub
 - `YOUR_TEMPLATE_REPO_NAME`
 - `YOUR_TEMPLATE_REPO_TYPE`
 
-All the parameters in the example above are mandatory for now, `repoType` only support `github` for now. 
+All the parameters in the example above are mandatory for now, `scmType` only support `github` for now. 
 
 ### vars
 
@@ -76,64 +76,6 @@ This configuration is used for template render, It has default variables listed 
 }
 ```
 
-## Examples 
-
-### official scaffolding repo config
-
-These repos are official scaffolding repo to use for `sourceRepo` config, You can use these repo directly or just create one for yourself.
-
-| language | org | repo |
-|  ----  | ----  |----  |
-| Golang | devstream-io | dtm-scaffolding-golang |
-| Java Spring | spring-guides | gs-spring-boot |
-
-
-### Golang
-
-```yaml
-tools:
-  - name: repo-scaffolding
-    instanceID: golang-scaffolding
-    options:
-      destinationRepo:
-        owner: test_owner
-        org: ""
-        repo: dtm-test-golang
-        branch: main
-        repoType: github
-      sourceRepo:
-        org: devstream-io
-        repo: dtm-scaffolding-golang
-        repoType: github
-      vars:
-        ImageRepo: dtm-test/golang-repo
-```
-
-This config will create `dtm-test-golang` repo for user test_owner in GitHub, and the variable ImageRepo will be used for template render. 
-
-### Java Spring
-
-```yaml
-tools:
-  - name: repo-scaffolding
-    instanceID: java-scaffolding
-    options:
-      destinationRepo:
-        owner: test_owner
-        org: ""
-        repo: dtm-test-java
-        branch: main
-        baseUrl: 127.0.0.1:30001
-        visibility: public
-        repoType: gitlab
-      sourceRepo:
-        org: spring-guides
-        repo: gs-spring-boot
-        repoType: github
-```
-
-this config will create `dtm-test-java` repo for user test_owner in GitHub.
-
 ## Outputs
 
 This plugin has three outputs:
@@ -141,3 +83,84 @@ This plugin has three outputs:
 - `owner`
 - `repo`
 - `repoURL`
+
+
+## Examples 
+
+### official scaffolding repo config
+
+These repos are official scaffolding repo to use for `sourceRepo` config, You can use these repo directly or just create one for yourself.
+
+| language    | org           | repo                       |
+|-------------|---------------|----------------------------|
+| Golang      | devstream-io  | dtm-repo-scaffolding-golang     |
+| Golang      | devstream-io  | dtm-repo-scaffolding-golang-cli |
+| Java Spring | spring-guides | gs-spring-boot             |
+
+
+### Golang
+
+```yaml
+tools:
+- name: repo-scaffolding
+  instanceID: golang-scaffolding
+  options:
+    destinationRepo:
+      owner: test_owner
+      org: ""
+      name: dtm-test-golang
+      branch: main
+      scmType: github
+    sourceRepo:
+      org: devstream-io
+      name: dtm-repo-scaffolding-golang
+      scmType: github
+    vars:
+      imageRepo: dtm-test/golang-repo
+```
+
+This config will create `dtm-test-golang` repo for user test_owner in GitHub, and the variable ImageRepo will be used for template render. 
+
+### Golang CLI
+
+```yaml
+tools:
+- name: repo-scaffolding
+  instanceID: golang-cli-scaffolding
+  options:
+    destinationRepo:
+      owner: test_owner
+      org: ""
+      name: dtm-test-golang-cli
+      branch: main
+      scmType: github
+    sourceRepo:
+      org: devstream-io
+      name: dtm-repo-scaffolding-golang-cli
+      scmType: github
+```
+
+This config will create `dtm-test-golang-cli` repo for user test_owner in GitHub.
+
+### Java Spring
+
+```yaml
+tools:
+- name: repo-scaffolding
+  instanceID: java-scaffolding
+  options:
+    destinationRepo:
+      owner: test_owner
+      org: ""
+      name: dtm-test-java
+      branch: main
+      baseUrl: 127.0.0.1:30001
+      visibility: public
+      scmType: gitlab
+    sourceRepo:
+      org: spring-guides
+      name: gs-spring-boot
+      scmType: github
+```
+
+this config will create `dtm-test-java` repo for user test_owner in GitHub.

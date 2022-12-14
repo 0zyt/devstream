@@ -1,27 +1,29 @@
 package golang
 
 import (
+	"github.com/devstream-io/devstream/internal/pkg/configmanager"
 	"github.com/devstream-io/devstream/internal/pkg/plugin/gitlabci"
-	"github.com/devstream-io/devstream/internal/pkg/plugininstaller"
-	"github.com/devstream-io/devstream/internal/pkg/plugininstaller/ci"
+	"github.com/devstream-io/devstream/internal/pkg/plugin/installer"
+	"github.com/devstream-io/devstream/internal/pkg/plugin/installer/ci/cifile"
+	"github.com/devstream-io/devstream/internal/pkg/statemanager"
 	"github.com/devstream-io/devstream/pkg/util/log"
 )
 
-func Create(options map[string]interface{}) (map[string]interface{}, error) {
-	operator := &plugininstaller.Operator{
-		PreExecuteOperations: plugininstaller.PreExecuteOperations{
-			ci.SetDefaultConfig(gitlabci.DefaultCIOptions),
+func Create(options configmanager.RawOptions) (statemanager.ResourceStatus, error) {
+	operator := &installer.Operator{
+		PreExecuteOperations: installer.PreExecuteOperations{
+			cifile.SetDefaultConfig(gitlabci.DefaultCIOptions),
 			setCIContent,
-			ci.Validate,
+			cifile.Validate,
 		},
-		ExecuteOperations: plugininstaller.ExecuteOperations{
-			ci.PushCIFiles,
+		ExecuteOperations: installer.ExecuteOperations{
+			cifile.PushCIFiles,
 		},
-		GetStateOperation: ci.GetCIFileStatus,
+		GetStatusOperation: cifile.GetCIFileStatus,
 	}
 
 	// Execute all Operations in Operator
-	status, err := operator.Execute(plugininstaller.RawOptions(options))
+	status, err := operator.Execute(options)
 	if err != nil {
 		return nil, err
 	}

@@ -22,12 +22,6 @@ var cascGroovyScript string
 //go:embed tpl/repo-casc.tpl.yaml
 var repoCascScript string
 
-type BasicAuth struct {
-	Username string
-	Password string
-	Token    string
-}
-
 type scriptError struct {
 	output   string
 	errorMsg string
@@ -37,6 +31,7 @@ type RepoCascConfig struct {
 	// common variables
 	RepoType     string
 	CredentialID string
+	Offline      bool
 	// gitlab variables
 	GitLabConnectionName string
 	GitlabURL            string
@@ -83,7 +78,6 @@ func (jenkins *jenkins) ExecuteScript(script string) (string, error) {
 			errorMsg: err.Error(),
 		}
 	}
-	log.Debugf("------> %s\n%s", output, script)
 	defer r.Body.Close()
 
 	if r.StatusCode != http.StatusOK {
@@ -104,6 +98,7 @@ func (jenkins *jenkins) ExecuteScript(script string) (string, error) {
 }
 
 func (jenkins *jenkins) ConfigCascForRepo(repoCascConfig *RepoCascConfig) error {
+	log.Info("jenkins start config casc...")
 	cascConfig, err := template.Render(
 		"jenkins-repo-casc", repoCascScript, repoCascConfig,
 	)

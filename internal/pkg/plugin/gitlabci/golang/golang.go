@@ -1,17 +1,18 @@
 package golang
 
 import (
-	"github.com/devstream-io/devstream/internal/pkg/plugininstaller"
-	"github.com/devstream-io/devstream/internal/pkg/plugininstaller/ci"
+	"github.com/devstream-io/devstream/internal/pkg/configmanager"
+	"github.com/devstream-io/devstream/internal/pkg/plugin/installer/ci/cifile"
 	"github.com/devstream-io/devstream/pkg/util/scm/gitlab"
+	"github.com/devstream-io/devstream/pkg/util/types"
 )
 
-func setCIContent(options plugininstaller.RawOptions) (plugininstaller.RawOptions, error) {
-	opts, err := ci.NewOptions(options)
+func setCIContent(options configmanager.RawOptions) (configmanager.RawOptions, error) {
+	opts, err := cifile.NewOptions(options)
 	if err != nil {
 		return nil, err
 	}
-	gitlabClient, err := gitlab.NewClient(opts.ProjectRepo.BuildRepoInfo())
+	gitlabClient, err := gitlab.NewClient(opts.ProjectRepo)
 	if err != nil {
 		return nil, err
 	}
@@ -20,11 +21,11 @@ func setCIContent(options plugininstaller.RawOptions) (plugininstaller.RawOption
 	if err != nil {
 		return nil, err
 	}
-	ciConfig := opts.CIConfig
-	if ciConfig == nil {
-		ciConfig = &ci.CIConfig{}
+	CIFileConfig := opts.CIFileConfig
+	if CIFileConfig == nil {
+		CIFileConfig = &cifile.CIFileConfig{}
 	}
-	ciConfig.Content = ciContent
-	opts.CIConfig = ciConfig
-	return opts.Encode()
+	CIFileConfig.SetContent(ciContent)
+	opts.CIFileConfig = CIFileConfig
+	return types.EncodeStruct(opts)
 }

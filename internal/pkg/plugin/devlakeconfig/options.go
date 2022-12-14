@@ -3,8 +3,8 @@ package devlakeconfig
 import (
 	"github.com/mitchellh/mapstructure"
 
+	"github.com/devstream-io/devstream/internal/pkg/configmanager"
 	"github.com/devstream-io/devstream/internal/pkg/plugin/devlakeconfig/staging"
-	"github.com/devstream-io/devstream/internal/pkg/plugininstaller"
 )
 
 // Options is the struct for configurations of the devlake-config plugin.
@@ -14,7 +14,7 @@ type Options struct {
 }
 
 // NewOptions create options by raw options
-func NewOptions(options plugininstaller.RawOptions) (Options, error) {
+func NewOptions(options configmanager.RawOptions) (Options, error) {
 	var opts Options
 	if err := mapstructure.Decode(options, &opts); err != nil {
 		return opts, err
@@ -43,8 +43,25 @@ type DevLakePlugin struct {
 
 type Connection struct {
 	staging.RestConnection `mapstructure:",squash"`
-	Authx                  Auth `mapstructure:"auth" validate:"required"`
-	Auth                   `mapstructure:",squash"`
+	// a connection format in dtm config:
+	// - name: ""
+	//   endpoint: ""
+	//   proxy: ""
+	//   rateLimitPerHour: 0
+	//   auth:
+	//     username: "changeme"
+	//     password: "changeme"
+	Auth Auth `mapstructure:"auth" validate:"required"`
+	// a connection format in DevLake api:
+	// {
+	//   "name": ""
+	//   "endpoint": ""
+	//   "proxy": ""
+	//   "rateLimitPerHour": 0
+	//   "username": "changeme"
+	//   "password": "changeme"
+	// }
+	InlineAuth `mapstructure:",squash"`
 }
 
 type Auth struct {
@@ -53,10 +70,31 @@ type Auth struct {
 	staging.AppKey      `mapstructure:",squash"`
 }
 
-func (o *Options) Encode() (map[string]interface{}, error) {
-	var options map[string]interface{}
+type InlineAuth Auth
+
+func (o *Options) Encode() (configmanager.RawOptions, error) {
+	var options configmanager.RawOptions
 	if err := mapstructure.Decode(o, &options); err != nil {
 		return nil, err
 	}
 	return options, nil
+}
+
+func RenderAuthConfig(options configmanager.RawOptions) (configmanager.RawOptions, error) {
+	opts, err := NewOptions(options)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, p := range opts.Plugins {
+		for _, c := range p.Connections {
+			c.Token = c.Auth.Token
+			c.Username = c.Auth.Username
+			c.Password = c.Auth.Password
+			c.AppId = c.Auth.AppId
+			c.SecretKey = c.Auth.SecretKey
+		}
+	}
+
+	return opts.Encode()
 }

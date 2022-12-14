@@ -15,10 +15,13 @@ tools:
       # jenkins namespace in k8s cluster
       namespace: jenkins
       # restart jenkins if true for plugin install
-      enableRestart: true
+      enableRestart: false
+      # if offline is true, jenkins-pipeline will not install jenkins plugins and share library
+      # it will use a local Jenkinsfile for jenkins-pipeline
+      offline: false
     scm:
-      # cloneURL is the project repo location, this can be http address or git address
-      cloneURL: git@gitlab.com/root/test-exmaple.git
+      # url is the project repo location, this can be http address or git address
+      url: git@gitlab.com/root/test-exmaple.git
       # apiURL is the api address of gitlab, if you use github, this field can be empty
       apiURL: http://gitlab.example.com
       # project branch, if your repo type is github, default branch will be main. if your repo type is gitlab, default branch will be master
@@ -26,8 +29,8 @@ tools:
     pipeline:
       # jobName is jenkins's job name; <jobFolder/jobName> or <jobName>; e.g. jobs/test-job, test-job, jobs2/test-job
       jobName: test-job
-      # jenkinsfilePath is the location describe how to get Jenkinsfile, it can be remote or local
-      jenkinsfilePath: https://raw.githubusercontent.com/devstream-io/devstream/main/staging/dtm-jenkins-pipeline-example/general/Jenkinsfile
+      # configLocation is the location describe how to get Jenkinsfile, it can be remote or local
+      configLocation: https://raw.githubusercontent.com/devstream-io/devstream/main/staging/dtm-jenkins-pipeline-example/general/Jenkinsfile
       imageRepo:
         # image repo URL for pulling/pushing
         url: http://harbor.example.com:80
