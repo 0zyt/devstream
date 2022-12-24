@@ -1,5 +1,17 @@
 # 用 DevStream 搭建 GitLab + Jenkins + Harbor 工具链，管理 Java Spring Boot 项目开发生命周期全流程
 
+## 0、配套视频
+
+我们给本文流程录制了视频 demo，你可以根据自己的习惯决定先看视频版还是文字版：
+
+<div class="video-wrapper">
+    <iframe width="1280" height="500" src="https://player.bilibili.com/player.html?cid=931459808&aid=819045554&page=1&as_wide=1&high_quality=1&danmaku=0" allowfullscreen></iframe>
+</div>
+
+!!! hint "提示"
+
+    跳转到B站观看清晰度更高。
+
 ## 1、概述
 
 本文将介绍如何通过 DevStream 在本地部署 `GitLab + Jenkins + Harbor` 工具链，并且以 Java Spring Boot 项目为例，演示如何通过 DevStream 快速创建 Java Spring Boot 项目脚手架，同时在 Jenkins 上自动创建对应的 Pipeline 实现 Java Spring Boot 项目的 CI 流程。
@@ -83,7 +95,7 @@ DevStream 可以简单地以 **local** 作为 Backend，也就是将状态保存
 
 下文将以 `local` Backend 为例演示。
 
-在编写 `gitlab-ce-docker`、`jenkins` 和 `harbor` 三个插件的配置文件之前，你需要先定义一些变量，这会让工具的配置和维护变得更加简单：
+在编写 `gitlab-ce-docker` 和 `helm-installer`（用户安装 Jenkins 和 Harbor）这两个插件的配置文件之前，你需要先定义一些变量，这会让后续的配置和维护工作变得更加简单：
 
 ```yaml title="config-tools.yaml"
 config:
@@ -291,7 +303,7 @@ Stdout: 34cdd2a834a1c21be192064eacf1e29536ff45c52562956b97d6d376a5dae11b
 
 ```sh
 docker exec -it gitlab bash
-echo "44.33.22.11 gitlab.example.com" >> /etc/hosts
+echo "44.33.22.11 jenkins.example.com" >> /etc/hosts
 exit
 ```
 
@@ -399,7 +411,7 @@ pipelineTemplates:
       enableRestart: true
     imageRepo:
       user: admin
-      url: http://[[ harborURL ]]/library
+      url: [[ harborURL ]]/library
 ```
 
 可以看到这里的状态配置换成了 devstream-app.state，这里需要保证和前面 tools 所使用的状态文件不是同一个。

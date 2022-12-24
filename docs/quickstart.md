@@ -15,8 +15,10 @@ In your working directory, run:
 sh -c "$(curl -fsSL https://download.devstream.io/download.sh)"
 ```
 
+<script id="asciicast-TqB17iqGyksHVKOMNVDqSqgQn" src="https://asciinema.org/a/TqB17iqGyksHVKOMNVDqSqgQn.js" async></script>
+
 !!! note "Note"
-    the command above does the following:
+    The command above does the following:
  
     - find out your OS and chip architecture
     - find the latest version of the `dtm` binary
@@ -66,6 +68,8 @@ Then we run the following commands to update our config file with those env vars
     sed -i "s@YOUR_DOCKER_USERNAME@${DOCKERHUB_USERNAME}@g" config.yaml
     ```
 
+<script id="asciicast-4yp3VlJZ3WsPbuVwlh6GsXTJI" src="https://asciinema.org/a/4yp3VlJZ3WsPbuVwlh6GsXTJI.js" async></script>
+
 ---
 
 ## 3 Init
@@ -76,30 +80,7 @@ Run:
 ./dtm init -f config.yaml
 ```
 
-!!! success "You should see some output similar to the following"
-    ```text title=""
-    2022-12-12 11:40:34 ℹ [INFO]  Using dir </Users/stein/.devstream/plugins> to store plugins.
-    2022-12-12 11:40:34 ℹ [INFO]  -------------------- [  repo-scaffolding-darwin-arm64_0.10.2  ] --------------------
-    2022-12-12 11:40:35 ℹ [INFO]  Downloading: [repo-scaffolding-darwin-arm64_0.10.2.so] ...
-     87.75 MiB / 87.75 MiB [================================] 100.00% 7.16 MiB/s 12s
-    2022-12-12 11:40:47 ✔ [SUCCESS]  [repo-scaffolding-darwin-arm64_0.10.2.so] download succeeded.
-    2022-12-12 11:40:48 ℹ [INFO]  Downloading: [repo-scaffolding-darwin-arm64_0.10.2.md5] ...
-     33 B / 33 B [=========================================] 100.00% 115.84 KiB/s 0s
-    2022-12-12 11:40:48 ✔ [SUCCESS]  [repo-scaffolding-darwin-arm64_0.10.2.md5] download succeeded.
-    2022-12-12 11:40:48 ℹ [INFO]  Initialize [repo-scaffolding-darwin-arm64_0.10.2] finished.
-    2022-12-12 11:40:48 ℹ [INFO]  -------------------- [  repo-scaffolding-darwin-arm64_0.10.2  ] --------------------
-
-    2022-12-12 11:40:48 ℹ [INFO]  -------------------- [  github-actions-darwin-arm64_0.10.2  ] --------------------
-    2022-12-12 11:40:48 ℹ [INFO]  Downloading: [github-actions-darwin-arm64_0.10.2.so] ...
-     90.27 MiB / 90.27 MiB [================================] 100.00% 10.88 MiB/s 8s
-    2022-12-12 11:40:57 ✔ [SUCCESS]  [github-actions-darwin-arm64_0.10.2.so] download succeeded.
-    2022-12-12 11:40:57 ℹ [INFO]  Downloading: [github-actions-darwin-arm64_0.10.2.md5] ...
-     33 B / 33 B [=========================================] 100.00% 145.46 KiB/s 0s
-    2022-12-12 11:40:57 ✔ [SUCCESS]  [github-actions-darwin-arm64_0.10.2.md5] download succeeded.
-    2022-12-12 11:40:57 ℹ [INFO]  Initialize [github-actions-darwin-arm64_0.10.2] finished.
-    2022-12-12 11:40:57 ℹ [INFO]  -------------------- [  github-actions-darwin-arm64_0.10.2  ] --------------------
-    2022-12-12 11:40:57 ✔ [SUCCESS]  Initialize finished.
-    ```
+<script id="asciicast-p3Uq9NuC5R53gRrUYmd6aMMRx" src="https://asciinema.org/a/p3Uq9NuC5R53gRrUYmd6aMMRx.js" async></script>
 
 ---
 
@@ -111,26 +92,7 @@ Run:
 ./dtm apply -f config.yaml -y
 ```
 
-!!! success "You should see similar output to the following"
-
-    ```text title=""
-    2022-12-12 11:44:39 ℹ [INFO]  Apply started.
-    2022-12-12 11:44:39 ℹ [INFO]  Using local backend. State file: devstream.state.
-    2022-12-12 11:44:39 ℹ [INFO]  Tool (repo-scaffolding/golang-github) found in config but doesn't exist in the state, will be created.
-    2022-12-12 11:44:39 ℹ [INFO]  Tool (github-actions/default) found in config but doesn't exist in the state, will be created.
-    2022-12-12 11:44:39 ℹ [INFO]  Start executing the plan.
-    2022-12-12 11:44:39 ℹ [INFO]  Changes count: 2.
-    2022-12-12 11:44:39 ℹ [INFO]  -------------------- [  Processing progress: 1/2.  ] --------------------
-    2022-12-12 11:44:39 ℹ [INFO]  Processing: (repo-scaffolding/golang-github) -> Create ...
-    2022-12-12 11:44:39 ℹ [INFO]  github start to download repoTemplate...2022-12-12 11:44:42 ✔ [SUCCESS]  The repo go-webapp-devstream-demo has been created.
-    2022-12-12 11:44:49 ✔ [SUCCESS]  Tool (repo-scaffolding/golang-github) Create done.
-    2022-12-12 11:44:49 ℹ [INFO]  -------------------- [  Processing progress: 2/2.  ] --------------------
-    2022-12-12 11:44:49 ℹ [INFO]  Processing: (github-actions/default) -> Create ...
-    2022-12-12 11:44:57 ✔ [SUCCESS]  Tool (github-actions/default) Create done.
-    2022-12-12 11:44:57 ℹ [INFO]  -------------------- [  Processing done.  ] --------------------
-    2022-12-12 11:44:57 ✔ [SUCCESS]  All plugins applied successfully.
-    2022-12-12 11:44:57 ✔ [SUCCESS]  Apply finished.
-    ```
+<script id="asciicast-eoWGI8l6wiNZ3misK8xZjp1fv" src="https://asciinema.org/a/eoWGI8l6wiNZ3misK8xZjp1fv.js" async></script>
 
 ---
 

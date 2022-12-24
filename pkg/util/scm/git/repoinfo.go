@@ -31,7 +31,7 @@ type RepoInfo struct {
 	// used for gitlab
 	Namespace     string `mapstructure:"nameSpace,omitempty"`
 	Visibility    string `mapstructure:"visibility,omitempty"`
-	BaseURL       string `mapstructure:"baseURL,omitempty"`
+	BaseURL       string `yaml:"baseURL" mapstructure:"baseURL,omitempty"`
 	SSHPrivateKey string `yaml:"sshPrivateKey" mapstructure:"sshPrivateKey,omitempty"`
 
 	// used for GitHub
@@ -55,14 +55,26 @@ func (r *RepoInfo) SetDefault() error {
 }
 
 func (r *RepoInfo) GetRepoOwner() string {
+	// if org or owner is not empty, return org/owner
 	if r.Org != "" {
 		return r.Org
 	}
-	return r.Owner
+	if r.Owner != "" {
+		return r.Owner
+	}
+	// else return owner extract from url
+	if r.CloneURL != "" {
+		owner, _, err := r.CloneURL.extractRepoOwnerAndName()
+		if err != nil {
+			log.Warnf("git GetRepoName failed %s", err)
+		}
+		return owner
+	}
+	return ""
 }
 
 func (r *RepoInfo) GetRepoPath() string {
-	return fmt.Sprintf("%s/%s", r.GetRepoOwner(), r.Repo)
+	return fmt.Sprintf("%s/%s", r.GetRepoOwner(), r.GetRepoName())
 }
 
 func (r *RepoInfo) GetRepoName() string {
@@ -82,7 +94,7 @@ func (r *RepoInfo) GetRepoName() string {
 func (r *RepoInfo) GetCloneURL() string {
 	var cloneURL string
 	if r.CloneURL != "" {
-		cloneURL = string(r.CloneURL)
+		cloneURL = string(r.CloneURL.addGithubURLScheme())
 	} else {
 		cloneURL = string(r.buildScmURL())
 	}
@@ -97,15 +109,19 @@ func (r *RepoInfo) Encode() map[string]any {
 	return m
 }
 
+// IsGithubRepo return ture if repo is github
+func (r *RepoInfo) IsGithubRepo() bool {
+	return r.RepoType == "github" || strings.Contains(string(r.CloneURL), "github")
+}
+
 func (r *RepoInfo) getBranchWithDefault() string {
 	branch := r.Branch
 	if branch != "" {
 		return branch
 	}
-	switch r.RepoType {
-	case "github":
+	if r.IsGithubRepo() {
 		branch = "main"
-	case "gitlab":
+	} else {
 		branch = "master"
 	}
 	return branch
@@ -131,14 +147,13 @@ func (r *RepoInfo) buildScmURL() ScmURL {
 }
 
 func (r *RepoInfo) checkNeedUpdateFromURL() bool {
-	return r.CloneURL != "" && r.Repo == ""
+	return r.CloneURL != "" && (r.RepoType == "" || r.Repo == "")
 }
 
 func (r *RepoInfo) updateFieldsFromURLField() error {
 	// 1. config basic info for different repo type
-	if isGithubRepo(r.RepoType, r.CloneURL) {
+	if r.IsGithubRepo() {
 		r.RepoType = "github"
-		r.CloneURL = r.CloneURL.addGithubURLScheme()
 	} else {
 		r.RepoType = "gitlab"
 		// extract gitlab baseURL from url string
@@ -158,7 +173,7 @@ func (r *RepoInfo) updateFieldsFromURLField() error {
 	if err != nil {
 		return err
 	}
-	if r.Org == "" && r.Repo == "" {
+	if r.Org == "" && r.Owner == "" {
 		r.Owner = repoOwner
 	}
 	r.Repo = repoName
@@ -200,7 +215,7 @@ func (r *RepoInfo) checkValid() error {
 // extractRepoOwnerAndName will get repoOwner and repoName from ScmURL
 func (u ScmURL) extractRepoOwnerAndName() (string, string, error) {
 	var paths string
-	ScmURLStr := string(u)
+	ScmURLStr := string(u.addGithubURLScheme())
 	c, err := url.ParseRequestURI(ScmURLStr)
 	if err != nil {
 		if strings.Contains(ScmURLStr, "git@") {
@@ -227,18 +242,13 @@ func (u ScmURL) extractRepoOwnerAndName() (string, string, error) {
 	return repoOwner, repoName, nil
 }
 
-// formatGithubCloneURL will add "https://"  in github url config if it doesn't contain schme
+// addGithubURLScheme will add "https://"  in github url config if it doesn't contain schme
 func (u ScmURL) addGithubURLScheme() ScmURL {
 	cloneURL := string(u)
 	if !strings.Contains(cloneURL, "git@") && !strings.HasPrefix(cloneURL, "http") {
 		return ScmURL(fmt.Sprintf("https://%s", cloneURL))
 	}
 	return u
-}
-
-// isGithubRepo return ture if repo is github
-func isGithubRepo(scmType string, url ScmURL) bool {
-	return scmType == "github" || strings.Contains(string(url), "github")
 }
 
 func extractBaseURLfromRaw(repoURL string) (string, error) {
